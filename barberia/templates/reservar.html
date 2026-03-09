@@ -1,0 +1,173 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Reservar Cita - Barbería</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+</head>
+
+<body>
+
+<nav class="navbar navbar-dark bg-dark">
+<div class="container">
+<a class="navbar-brand">Barbería Moderno</a>
+</div>
+</nav>
+
+<div class="container mt-4">
+
+<div class="card shadow">
+
+<div class="card-header bg-primary text-white">
+Reserva tu cita
+</div>
+
+<div class="card-body">
+
+{% if error %}
+<div class="alert alert-danger">
+{{ error }}
+</div>
+{% endif %}
+
+<form method="POST">
+{% csrf_token %}
+
+<div class="mb-3">
+<label class="form-label">Nombre</label>
+<input type="text" class="form-control" name="nombre" required>
+</div>
+
+<div class="mb-3">
+<label class="form-label">Teléfono</label>
+<input type="text" class="form-control" name="telefono" required>
+</div>
+
+<div class="mb-3">
+<label class="form-label">Barbero</label>
+
+<select class="form-select" id="barbero" name="barbero" required>
+
+<option value="">Seleccione barbero</option>
+
+{% for b in barberos %}
+<option value="{{ b.id }}">{{ b.nombre }}</option>
+{% endfor %}
+
+</select>
+
+</div>
+
+<div class="mb-3">
+
+<label class="form-label">Servicio</label>
+
+<select class="form-select" name="servicio" required>
+
+<option value="">Seleccione servicio</option>
+
+{% for s in servicios %}
+<option value="{{ s.id }}">
+{{ s.nombre }} - ${{ s.precio }}
+</option>
+{% endfor %}
+
+</select>
+
+</div>
+
+<div class="mb-3">
+
+<label class="form-label">Fecha</label>
+
+<input type="date" class="form-control" id="fecha" name="fecha" required>
+
+</div>
+
+<div class="mb-3">
+
+<label class="form-label">Hora</label>
+
+<select class="form-select" id="hora" name="hora" required>
+
+<option value="">Seleccione fecha y barbero</option>
+
+</select>
+
+</div>
+
+<button type="submit" class="btn btn-success w-100">
+Reservar Cita
+</button>
+
+</form>
+
+</div>
+</div>
+</div>
+
+<footer class="bg-dark text-white mt-5 p-3 text-center">
+© 2026 Barbería Moderno
+</footer>
+
+<script>
+
+document.getElementById("fecha").addEventListener("change", cargarHoras);
+document.getElementById("barbero").addEventListener("change", cargarHoras);
+
+function cargarHoras(){
+
+let fecha = document.getElementById("fecha").value
+let barbero = document.getElementById("barbero").value
+
+if(!fecha || !barbero) return;
+
+fetch(`/horas-disponibles/?fecha=${fecha}&barbero=${barbero}`)
+
+.then(response => response.json())
+
+.then(data => {
+
+let select = document.getElementById("hora")
+
+select.innerHTML = ""
+
+if(data.length === 0){
+
+let option = document.createElement("option")
+option.text = "No hay horas disponibles"
+option.value = ""
+
+select.appendChild(option)
+
+return
+}
+
+data.forEach(hora => {
+
+let option = document.createElement("option")
+
+option.value = hora
+option.text = hora
+
+select.appendChild(option)
+
+})
+
+})
+
+}
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

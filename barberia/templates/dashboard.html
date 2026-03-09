@@ -1,0 +1,39 @@
+<div class="row mt-4">
+
+<div class="col-md-3">
+<div class="card bg-success text-white">
+<div class="card-body">
+<h5>Ingresos Hoy</h5>
+<h3>${{ ingresos_hoy }}</h3>
+</div>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card bg-primary text-white">
+<div class="card-body">
+<h5>Ingresos del Mes</h5>
+<h3>${{ ingresos_mes }}</h3>
+</div>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card bg-warning text-dark">
+<div class="card-body">
+<h5>Servicio Más Vendido</h5>
+<h4>{{ servicio_top.servicio__nombre }}</h4>
+</div>
+</div>
+</div>
+
+<div class="col-md-3">
+<div class="card bg-info text-white">
+<div class="card-body">
+<h5>Barbero Top</h5>
+<h4>{{ barbero_top.barbero__nombre }}</h4>
+</div>
+</div>
+</div>
+
+</div>

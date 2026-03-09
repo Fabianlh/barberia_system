@@ -1,0 +1,34 @@
+<h2>Detalle de la Cita</h2>
+
+<p><b>Cliente:</b> {{ cita.cliente }}</p>
+<p><b>Servicio:</b> {{ cita.servicio }}</p>
+<p><b>Barbero:</b> {{ cita.barbero }}</p>
+<p><b>Fecha:</b> {{ cita.fecha }}</p>
+<p><b>Hora:</b> {{ cita.hora }}</p>
+
+<p>
+<b>Estado:</b>
+
+{% if cita.estado == "pendiente" %}
+🟡 Pendiente
+{% elif cita.estado == "atendida" %}
+🟢 Atendida
+{% elif cita.estado == "cancelada" %}
+🔴 Cancelada
+{% endif %}
+
+</p>
+
+<br>
+
+<a href="{% url 'marcar_atendida' cita.id %}">
+<button style="background:green;color:white;padding:10px;">
+ATENDER CITA
+</button>
+</a>
+
+<a href="{% url 'cancelar_cita' cita.id %}">
+<button style="background:red;color:white;padding:10px;">
+CANCELAR CITA
+</button>
+</a>

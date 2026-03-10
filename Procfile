@@ -1,1 +1,1 @@
-web: gunicorn barberia_system.wsgi
+web: gunicorn barberia_system.wsgi:application

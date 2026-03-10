@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: barberia-system
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn barberia_system.wsgi:application"

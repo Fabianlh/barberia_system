@@ -1,52 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Calendario de Citas</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+<meta charset="UTF-8">
 
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<title>Calendario Barbería</title>
+
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f9;
+}
+
+.container{
+width:95%;
+margin:auto;
+margin-top:40px;
+}
+
+#calendar{
+background:white;
+padding:20px;
+border-radius:10px;
+}
+
+</style>
 
 </head>
+
 <body>
 
-<h2>Calendario de Citas 💈</h2>
+<div class="container">
+
+<h2>Agenda de Citas</h2>
 
 <div id="calendar"></div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 
 <script>
 
 document.addEventListener('DOMContentLoaded', function() {
 
-    var calendarEl = document.getElementById('calendar');
+var calendarEl = document.getElementById('calendar');
 
-    var calendar = new FullCalendar.Calendar(calendarEl, {
+var calendar = new FullCalendar.Calendar(calendarEl, {
 
-        initialView: 'dayGridMonth',
+initialView: 'timeGridWeek',
 
-        locale: 'es',
+locale:'es',
 
-        events: '/citas-json/',
+editable:true,
 
-        eventDidMount: function(info){
+headerToolbar:{
+left:'prev,next today',
+center:'title',
+right:'dayGridMonth,timeGridWeek,timeGridDay'
+},
 
-            if(info.event.extendedProps.estado == "reservada"){
-                info.el.style.backgroundColor = "#3498db";
-            }
+events:'/citas-json/',
 
-            if(info.event.extendedProps.estado == "atendida"){
-                info.el.style.backgroundColor = "#2ecc71";
-            }
 
-            if(info.event.extendedProps.estado == "cancelada"){
-                info.el.style.backgroundColor = "#e74c3c";
-            }
+eventClick:function(info){
 
-        }
+alert(
+"Cita\n\n"+
+info.event.title+
+"\nBarbero: "+info.event.extendedProps.barbero+
+"\nEstado: "+info.event.extendedProps.estado
+)
 
-    });
+},
 
-    calendar.render();
+
+eventDrop:function(info){
+
+let fecha = info.event.start.toISOString().slice(0,10)
+
+let hora = info.event.start.toTimeString().slice(0,5)
+
+fetch("/mover-cita/",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+
+id:info.event.id,
+
+fecha:fecha,
+
+hora:hora
+
+})
+
+})
+
+}
+
+
+});
+
+calendar.render();
 
 });
 
@@ -54,30 +117,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
-<script>
-
-document.addEventListener('DOMContentLoaded', function() {
-
-    var calendarEl = document.getElementById('calendar');
-
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-
-        initialView: 'dayGridMonth',
-        locale: 'es',
-        events: '/citas-json/',
-
-        eventClick: function(info) {
-
-            var id = info.event.id
-
-            window.location.href = "/atender-cita/" + id
-
-        }
-
-    });
-
-    calendar.render();
-
-});
-
-</script>

@@ -1,39 +1,229 @@
-<div class="row mt-4">
+<!DOCTYPE html>
+<html lang="es">
+<head>
 
-<div class="col-md-3">
-<div class="card bg-success text-white">
-<div class="card-body">
-<h5>Ingresos Hoy</h5>
-<h3>${{ ingresos_hoy }}</h3>
-</div>
-</div>
+<meta charset="UTF-8">
+
+<title>Dashboard Barbería</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f9;
+}
+
+.container{
+width:95%;
+margin:auto;
+margin-top:30px;
+}
+
+.cards{
+display:flex;
+gap:20px;
+flex-wrap:wrap;
+margin-bottom:30px;
+}
+
+.card{
+
+padding:20px;
+
+border-radius:10px;
+
+color:white;
+
+width:200px;
+
+}
+
+.azul{background:#007bff;}
+.verde{background:#28a745;}
+.naranja{background:#fd7e14;}
+.rojo{background:#dc3545;}
+
+.servicio-top{
+
+background:#20c997;
+
+color:white;
+
+padding:20px;
+
+border-radius:10px;
+
+margin-bottom:30px;
+
+width:300px;
+
+}
+
+table{
+
+width:100%;
+
+background:white;
+
+border-collapse:collapse;
+
+}
+
+th,td{
+
+padding:10px;
+
+border-bottom:1px solid #ddd;
+
+text-align:left;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Dashboard Barbería</h2>
+
+<p>Hoy: {{ hoy }}</p>
+
+<div class="cards">
+
+<div class="card azul">
+<h3>Citas Hoy</h3>
+<h1>{{ citas_hoy }}</h1>
 </div>
 
-<div class="col-md-3">
-<div class="card bg-primary text-white">
-<div class="card-body">
-<h5>Ingresos del Mes</h5>
-<h3>${{ ingresos_mes }}</h3>
-</div>
-</div>
+<div class="card verde">
+<h3>Ingresos Hoy</h3>
+<h1>${{ ingresos_hoy }}</h1>
 </div>
 
-<div class="col-md-3">
-<div class="card bg-warning text-dark">
-<div class="card-body">
-<h5>Servicio Más Vendido</h5>
-<h4>{{ servicio_top.servicio__nombre }}</h4>
-</div>
-</div>
+<div class="card naranja">
+<h3>Clientes</h3>
+<h1>{{ clientes }}</h1>
 </div>
 
-<div class="col-md-3">
-<div class="card bg-info text-white">
-<div class="card-body">
-<h5>Barbero Top</h5>
-<h4>{{ barbero_top.barbero__nombre }}</h4>
-</div>
-</div>
+<div class="card rojo">
+<h3>Barberos</h3>
+<h1>{{ barberos }}</h1>
 </div>
 
 </div>
+
+
+<div class="servicio-top">
+
+<h3>Servicio más solicitado</h3>
+
+{% if servicio_top %}
+
+<h2>{{ servicio_top.servicio__nombre }}</h2>
+
+<p>Citas realizadas: {{ servicio_top.total }}</p>
+
+{% else %}
+
+<p>No hay datos aún</p>
+
+{% endif %}
+
+</div>
+
+
+<h3>Ingresos</h3>
+
+<canvas id="graficaIngresos"></canvas>
+
+
+<h3>Últimas citas</h3>
+
+<table>
+
+<tr>
+
+<th>Cliente</th>
+
+<th>Servicio</th>
+
+<th>Barbero</th>
+
+<th>Fecha</th>
+
+<th>Hora</th>
+
+</tr>
+
+{% for cita in citas %}
+
+<tr>
+
+<td>{{ cita.cliente.nombre }}</td>
+
+<td>{{ cita.servicio.nombre }}</td>
+
+<td>{{ cita.barbero.nombre }}</td>
+
+<td>{{ cita.fecha }}</td>
+
+<td>{{ cita.hora }}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+
+<script>
+
+fetch("/estadisticas-chart/")
+
+.then(response => response.json())
+
+.then(data => {
+
+const ctx = document.getElementById('graficaIngresos');
+
+new Chart(ctx,{
+
+type:'line',
+
+data:{
+
+labels:data.labels,
+
+datasets:[{
+
+label:'Ingresos',
+
+data:data.valores,
+
+borderWidth:3
+
+}]
+
+},
+
+options:{
+
+responsive:true
+
+}
+
+})
+
+})
+
+</script>
+
+</body>
+</html>

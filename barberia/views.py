@@ -3,14 +3,13 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.db.models import Sum
-from django.db.models.functions import TruncDay
 from datetime import date, datetime
 
 from .models import Cliente, Cita, Servicio, Barbero
 
 
 # =============================
-# DASHBOARD ADMIN
+# DASHBOARD
 # =============================
 
 @login_required
@@ -19,36 +18,26 @@ def dashboard(request):
     hoy = date.today()
 
     citas_hoy = Cita.objects.filter(fecha=hoy).count()
-    total_clientes = Cliente.objects.count()
-    total_barberos = Barbero.objects.count()
+
+    clientes = Cliente.objects.count()
+
+    barberos = Barbero.objects.count()
 
     ingresos_hoy = Cita.objects.filter(
         fecha=hoy,
         estado="atendida"
     ).aggregate(total=Sum("precio"))["total"] or 0
 
-    ingresos_mes = Cita.objects.filter(
-        fecha__month=hoy.month,
-        estado="atendida"
-    ).aggregate(total=Sum("precio"))["total"] or 0
 
-    # servicio más vendido
     servicio_top = (
-        Cita.objects.filter(estado="atendida")
+        Cita.objects
+        .filter(estado="atendida")
         .values("servicio__nombre")
-        .annotate(total=Sum("precio"))
+        .annotate(total=Count("id"))
         .order_by("-total")
         .first()
     )
 
-    # barbero con más citas
-    barbero_top = (
-        Cita.objects.filter(estado="atendida")
-        .values("barbero__nombre")
-        .annotate(total=Sum("precio"))
-        .order_by("-total")
-        .first()
-    )
 
     citas = Cita.objects.select_related(
         "cliente",
@@ -56,19 +45,26 @@ def dashboard(request):
         "barbero"
     ).order_by("-fecha")[:10]
 
-    context = {
+
+    contexto = {
+
+        "hoy": hoy,
+
         "citas_hoy": citas_hoy,
-        "clientes": total_clientes,
-        "barberos": total_barberos,
+
+        "clientes": clientes,
+
+        "barberos": barberos,
+
         "ingresos_hoy": ingresos_hoy,
-        "ingresos_mes": ingresos_mes,
+
         "servicio_top": servicio_top,
-        "barbero_top": barbero_top,
+
         "citas": citas
+
     }
 
-    return render(request, "dashboard.html", context)
-
+    return render(request, "dashboard.html", contexto)
 # =============================
 # RESERVAR CITA
 # =============================
@@ -88,6 +84,7 @@ def reservar_cita(request):
         hora = request.POST.get("hora")
 
         fecha_hora = datetime.strptime(f"{fecha} {hora}", "%Y-%m-%d %H:%M")
+        fecha_hora = timezone.make_aware(fecha_hora)
 
         if fecha_hora < timezone.now():
             return render(request, "reservar.html", {
@@ -123,12 +120,7 @@ def reservar_cita(request):
             hora=hora
         )
 
-        return render(request, "confirmacion.html", {
-            "cliente": nombre,
-            "telefono": telefono,
-            "fecha": fecha,
-            "hora": hora
-        })
+        return render(request, "confirmacion.html")
 
     return render(request, "reservar.html", {
         "servicios": servicios,
@@ -160,116 +152,23 @@ def horas_disponibles(request):
 
     ocupadas = [c.strftime("%H:%M") for c in citas]
 
-    disponibles = [h for h in horarios if h not in ocupadas]
+    disponibles = []
+
+    ahora = timezone.localtime()
+
+    for h in horarios:
+
+        hora_dt = datetime.strptime(f"{fecha} {h}", "%Y-%m-%d %H:%M")
+        hora_dt = timezone.make_aware(hora_dt)
+
+        if h not in ocupadas and hora_dt > ahora:
+            disponibles.append(h)
 
     return JsonResponse(disponibles, safe=False)
 
 
 # =============================
-# CALENDARIO
-# =============================
-
-@login_required
-def calendario(request):
-    return render(request, "calendario.html")
-
-
-# =============================
-# EVENTOS DEL CALENDARIO
-# =============================
-
-def citas_json(request):
-
-    citas = Cita.objects.select_related(
-        "cliente","servicio","barbero"
-    ).all()
-
-    eventos = []
-
-    for cita in citas:
-
-        color = "#3788d8"
-
-        if cita.estado == "atendida":
-            color = "#28a745"
-
-        elif cita.estado == "cancelada":
-            color = "#dc3545"
-
-        eventos.append({
-            "id": cita.id,
-            "title": f"{cita.cliente.nombre} - {cita.servicio.nombre}",
-            "start": f"{cita.fecha}T{cita.hora}",
-            "color": color
-        })
-
-    return JsonResponse(eventos, safe=False)
-
-
-# =============================
-# PANEL BARBERO
-# =============================
-
-@login_required
-def panel_barbero(request):
-
-    citas = Cita.objects.select_related(
-        "cliente","servicio"
-    ).filter(
-        barbero__nombre=request.user.username
-    ).order_by("fecha","hora")
-
-    return render(request, "panel_barbero.html", {
-        "citas": citas
-    })
-
-
-# =============================
-# VER DETALLE CITA
-# =============================
-
-@login_required
-def atender_cita(request, cita_id):
-
-    cita = get_object_or_404(Cita, id=cita_id)
-
-    return render(request, "barberia/atender_cita.html", {
-        "cita": cita
-    })
-
-
-# =============================
-# MARCAR ATENDIDA
-# =============================
-
-@login_required
-def marcar_atendida(request, cita_id):
-
-    cita = get_object_or_404(Cita, id=cita_id)
-
-    cita.estado = "atendida"
-    cita.save()
-
-    return redirect("agenda")
-
-
-# =============================
-# CANCELAR CITA
-# =============================
-
-@login_required
-def cancelar_cita(request, cita_id):
-
-    cita = get_object_or_404(Cita, id=cita_id)
-
-    cita.estado = "cancelada"
-    cita.save()
-
-    return redirect("agenda")
-
-
-# =============================
-# AGENDA GENERAL
+# AGENDA
 # =============================
 
 @login_required
@@ -290,11 +189,145 @@ def agenda(request):
 
 
 # =============================
-# GRAFICA INGRESOS
+# CANCELAR CITA
 # =============================
 
 @login_required
-def ingresos_chart(request):
+def cancelar_cita(request, cita_id):
+
+    cita = get_object_or_404(Cita, id=cita_id)
+    cita.estado = "cancelada"
+    cita.save()
+
+    return redirect("agenda")
+
+
+# =============================
+# MARCAR ATENDIDA
+# =============================
+
+@login_required
+def marcar_atendida(request, cita_id):
+
+    cita = get_object_or_404(Cita, id=cita_id)
+    cita.estado = "atendida"
+    cita.save()
+
+    return redirect("agenda")
+
+
+# =============================
+# CALENDARIO
+# =============================
+
+@login_required
+def calendario(request):
+
+    citas = Cita.objects.select_related(
+        "cliente",
+        "servicio",
+        "barbero"
+    ).all()
+
+    return render(request, "calendario.html", {"citas": citas})
+
+
+# =============================
+# CITAS JSON (para calendario)
+# =============================
+
+def citas_json(request):
+
+    citas = Cita.objects.select_related(
+        "cliente",
+        "servicio",
+        "barbero"
+    ).all()
+
+    eventos = []
+
+    for cita in citas:
+
+        if cita.estado == "pendiente":
+            color = "#ffc107"
+
+        elif cita.estado == "atendida":
+            color = "#28a745"
+
+        else:
+            color = "#dc3545"
+
+        eventos.append({
+
+            "id": cita.id,
+
+            "title": f"{cita.cliente.nombre} - {cita.servicio.nombre}",
+
+            "start": f"{cita.fecha}T{cita.hora}",
+
+            "color": color,
+
+            "extendedProps": {
+                "barbero": cita.barbero.nombre,
+                "estado": cita.estado
+            }
+
+        })
+
+    return JsonResponse(eventos, safe=False)
+
+
+# =============================
+# PANEL BARBERO
+# =============================
+
+@login_required
+def panel_barbero(request):
+
+    hoy = date.today()
+
+    citas = Cita.objects.select_related(
+        "cliente",
+        "servicio",
+        "barbero"
+    ).filter(
+        fecha=hoy
+    ).order_by("hora")
+
+    contexto = {
+        "citas": citas,
+        "hoy": hoy
+    }
+
+    return render(request, "panel_barbero.html", contexto)
+
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+
+@csrf_exempt
+def mover_cita(request):
+
+    if request.method == "POST":
+
+        data = json.loads(request.body)
+
+        cita = Cita.objects.get(id=data["id"])
+
+        fecha = data["fecha"]
+        hora = data["hora"]
+
+        cita.fecha = fecha
+        cita.hora = hora
+
+        cita.save()
+
+        return JsonResponse({"status":"ok"})
+from django.db.models.functions import TruncDay
+
+
+@login_required
+def estadisticas_chart(request):
 
     datos = (
         Cita.objects.filter(estado="atendida")
@@ -308,6 +341,7 @@ def ingresos_chart(request):
     valores = []
 
     for d in datos:
+
         labels.append(d["dia"].strftime("%Y-%m-%d"))
         valores.append(float(d["total"]))
 

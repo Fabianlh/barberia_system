@@ -1,4 +1,4 @@
-pywin32==311
-pypiwin32==223
-pyttsx3==2.99
-comtypes==1.4.15
+Django
+gunicorn
+whitenoise
+psycopg2-binary

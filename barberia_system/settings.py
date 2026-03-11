@@ -4,120 +4,115 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# SECURITY
-SECRET_KEY = 'django-insecure-pm&=b&o#b#&i2_0na62q_e(u4@)^0%3@p!o@qkelc*r!3^)hi4'
+# SEGURIDAD
+SECRET_KEY = "django-insecure-change-this"
 
 DEBUG = False
 
+
 ALLOWED_HOSTS = [
-"barberia-system.onrender.com"
+    "127.0.0.1",
+    "localhost",
+    "barberia-system.onrender.com"
 ]
 
+
+# CSRF (MUY IMPORTANTE)
 CSRF_TRUSTED_ORIGINS = [
-"https://barberia-system.onrender.com"
+    "https://barberia-system.onrender.com"
 ]
-# APPLICATIONS
+
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+CSRF_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SAMESITE = "Lax"
+
+
+# APPS
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'barberia',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "barberia",
 ]
 
 
-# MIDDLEWARE
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-
-    # necesario para producción
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 
-ROOT_URLCONF = 'barberia_system.urls'
+ROOT_URLCONF = "barberia_system.urls"
 
 
-# TEMPLATES
 TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-
-        # correcto
-        'DIRS': [BASE_DIR / 'barberia' / 'templates'],
-
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
+{
+"BACKEND": "django.template.backends.django.DjangoTemplates",
+"DIRS": [BASE_DIR / "templates"],
+"APP_DIRS": True,
+"OPTIONS": {
+"context_processors": [
+"django.template.context_processors.request",
+"django.contrib.auth.context_processors.auth",
+"django.contrib.messages.context_processors.messages",
+],
+},
+},
 ]
 
 
-WSGI_APPLICATION = 'barberia_system.wsgi.application'
+WSGI_APPLICATION = "barberia_system.wsgi.application"
 
 
-LOGIN_REDIRECT_URL = '/panel-barbero/'
-LOGOUT_REDIRECT_URL = '/'
-
-
-# DATABASE
+# BASE DE DATOS
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+"default": {
+"ENGINE": "django.db.backends.sqlite3",
+"NAME": BASE_DIR / "db.sqlite3",
+}
 }
 
 
-# PASSWORD VALIDATION
+# PASSWORDS
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+{"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+{"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+{"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+{"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
 
-# INTERNATIONALIZATION
-LANGUAGE_CODE = 'es-co'
+# IDIOMA
+LANGUAGE_CODE = "es"
 
-TIME_ZONE = 'America/Bogota'
+TIME_ZONE = "America/Bogota"
 
 USE_I18N = True
 USE_TZ = True
 
 
-# STATIC FILES
-STATIC_URL = '/static/'
+# ARCHIVOS ESTATICOS
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'barberia' / 'static'
+    os.path.join(BASE_DIR, "static")
 ]
 
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_URL = "/admin/login/"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"

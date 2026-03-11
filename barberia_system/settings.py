@@ -7,9 +7,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY
 SECRET_KEY = 'django-insecure-pm&=b&o#b#&i2_0na62q_e(u4@)^0%3@p!o@qkelc*r!3^)hi4'
 
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["barberia-system.onrender.com"]
 
 
 # APPLICATIONS

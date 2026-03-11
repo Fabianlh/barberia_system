@@ -3,7 +3,6 @@
 <head>
 
 <meta charset="UTF-8">
-
 <title>Calendario Barbería</title>
 
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
@@ -45,25 +44,56 @@ border-radius:10px;
 
 <script>
 
-document.addEventListener('DOMContentLoaded', function() {
+function getCookie(name) {
 
-var calendarEl = document.getElementById('calendar');
+let cookieValue = null;
+
+if (document.cookie && document.cookie !== "") {
+
+const cookies = document.cookie.split(";");
+
+for (let i = 0; i < cookies.length; i++) {
+
+const cookie = cookies[i].trim();
+
+if (cookie.substring(0, name.length + 1) === (name + "=")) {
+
+cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+
+break;
+
+}
+
+}
+
+}
+
+return cookieValue;
+
+}
+
+const csrftoken = getCookie("csrftoken");
+
+
+document.addEventListener("DOMContentLoaded", function() {
+
+var calendarEl = document.getElementById("calendar");
 
 var calendar = new FullCalendar.Calendar(calendarEl, {
 
-initialView: 'timeGridWeek',
+initialView: "timeGridWeek",
 
-locale:'es',
+locale:"es",
 
 editable:true,
 
 headerToolbar:{
-left:'prev,next today',
-center:'title',
-right:'dayGridMonth,timeGridWeek,timeGridDay'
+left:"prev,next today",
+center:"title",
+right:"dayGridMonth,timeGridWeek,timeGridDay"
 },
 
-events:'/citas-json/',
+events:"/citas-json/",
 
 
 eventClick:function(info){
@@ -89,15 +119,14 @@ fetch("/mover-cita/",{
 method:"POST",
 
 headers:{
-"Content-Type":"application/json"
+"Content-Type":"application/json",
+"X-CSRFToken": csrftoken
 },
 
 body:JSON.stringify({
 
 id:info.event.id,
-
 fecha:fecha,
-
 hora:hora
 
 })
@@ -105,7 +134,6 @@ hora:hora
 })
 
 }
-
 
 });
 

@@ -9,15 +9,12 @@ SECRET_KEY = "django-insecure-change-this"
 
 DEBUG = False
 
-
 ALLOWED_HOSTS = [
-    "127.0.0.1",
+    "barberia-system.onrender.com",
     "localhost",
-    "barberia-system.onrender.com"
+    "127.0.0.1"
 ]
 
-
-# CSRF (MUY IMPORTANTE)
 CSRF_TRUSTED_ORIGINS = [
     "https://barberia-system.onrender.com"
 ]

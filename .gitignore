@@ -1,0 +1,17 @@
+# Python
+*.pyc
+__pycache__/
+
+# Base de datos local
+db.sqlite3
+
+# Entornos virtuales
+venv/
+env/
+
+# Archivos de sistema
+.DS_Store__pycache__/ 
+*.pyc 
+db.sqlite3 
+venv/ 
+.DS_Store 

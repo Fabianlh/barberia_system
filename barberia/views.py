@@ -3,7 +3,12 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.db.models import Sum, Count
+from django.db.models.functions import TruncDay
+from django.views.decorators.csrf import csrf_exempt
 from datetime import date, datetime
+import json
+
+from .models import Cliente, Cita, Servicio, Barbero
 
 
 # =============================
@@ -24,7 +29,7 @@ def dashboard(request):
     ingresos_hoy = Cita.objects.filter(
         fecha=hoy,
         estado="atendida"
-    ).aggregate(total=Sum("precio"))["total"] or 0
+    ).aggregate(total=Sum("servicio__precio"))["total"] or 0
 
 
     servicio_top = (
@@ -290,9 +295,9 @@ def panel_barbero(request):
     return render(request, "panel_barbero.html", contexto)
 
 
-from django.views.decorators.csrf import csrf_exempt
-import json
-
+# =============================
+# MOVER CITA (DRAG CALENDARIO)
+# =============================
 
 @csrf_exempt
 def mover_cita(request):
@@ -311,8 +316,9 @@ def mover_cita(request):
         return JsonResponse({"status":"ok"})
 
 
-from django.db.models.functions import TruncDay
-
+# =============================
+# ESTADISTICAS CHART
+# =============================
 
 @login_required
 def estadisticas_chart(request):
@@ -321,7 +327,7 @@ def estadisticas_chart(request):
         Cita.objects.filter(estado="atendida")
         .annotate(dia=TruncDay("fecha"))
         .values("dia")
-        .annotate(total=Sum("precio"))
+        .annotate(total=Sum("servicio__precio"))
         .order_by("dia")
     )
 

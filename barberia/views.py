@@ -10,7 +10,6 @@ import json
 
 from .models import Cliente, Cita, Servicio, Barbero
 
-
 # =============================
 # DASHBOARD
 # =============================

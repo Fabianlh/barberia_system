@@ -1,4 +1,4 @@
 Django>=4.2
 gunicorn
 whitenoise
-jazzmin==2.5.7  # versión compatible con Python 3.11
+jazzmin==2.5.7

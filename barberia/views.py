@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from django.db.models import Sum
+from django.db.models import Sum, Count
 from datetime import date, datetime
 
 from .models import Cliente, Cita, Servicio, Barbero
@@ -49,22 +49,18 @@ def dashboard(request):
     contexto = {
 
         "hoy": hoy,
-
         "citas_hoy": citas_hoy,
-
         "clientes": clientes,
-
         "barberos": barberos,
-
         "ingresos_hoy": ingresos_hoy,
-
         "servicio_top": servicio_top,
-
         "citas": citas
 
     }
 
     return render(request, "dashboard.html", contexto)
+
+
 # =============================
 # RESERVAR CITA
 # =============================
@@ -250,23 +246,17 @@ def citas_json(request):
 
         if cita.estado == "pendiente":
             color = "#ffc107"
-
         elif cita.estado == "atendida":
             color = "#28a745"
-
         else:
             color = "#dc3545"
 
         eventos.append({
 
             "id": cita.id,
-
             "title": f"{cita.cliente.nombre} - {cita.servicio.nombre}",
-
             "start": f"{cita.fecha}T{cita.hora}",
-
             "color": color,
-
             "extendedProps": {
                 "barbero": cita.barbero.nombre,
                 "estado": cita.estado
@@ -301,6 +291,7 @@ def panel_barbero(request):
 
     return render(request, "panel_barbero.html", contexto)
 
+
 from django.views.decorators.csrf import csrf_exempt
 import json
 
@@ -314,15 +305,14 @@ def mover_cita(request):
 
         cita = Cita.objects.get(id=data["id"])
 
-        fecha = data["fecha"]
-        hora = data["hora"]
-
-        cita.fecha = fecha
-        cita.hora = hora
+        cita.fecha = data["fecha"]
+        cita.hora = data["hora"]
 
         cita.save()
 
         return JsonResponse({"status":"ok"})
+
+
 from django.db.models.functions import TruncDay
 
 

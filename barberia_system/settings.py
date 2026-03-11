@@ -7,7 +7,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SEGURIDAD
 # =========================
 SECRET_KEY = "django-insecure-change-this"
-
 DEBUG = False
 
 ALLOWED_HOSTS = [
@@ -22,7 +21,6 @@ CSRF_TRUSTED_ORIGINS = [
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
-
 CSRF_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_SAMESITE = "Lax"
 
@@ -47,7 +45,7 @@ INSTALLED_APPS = [
 # =========================
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # sirve estáticos en producción
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # sirve estáticos
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -90,7 +88,7 @@ WSGI_APPLICATION = "barberia_system.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",  # en producción SQLite puede dar problemas si se escribe mucho
     }
 }
 
@@ -120,7 +118,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "barberia", "static")
 ]
-
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # =========================

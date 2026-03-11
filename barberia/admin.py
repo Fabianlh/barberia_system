@@ -23,6 +23,7 @@ class BarberoAdmin(admin.ModelAdmin):
 
 @admin.register(Cita)
 class CitaAdmin(admin.ModelAdmin):
+
     list_display = (
         "cliente",
         "servicio",
@@ -33,7 +34,11 @@ class CitaAdmin(admin.ModelAdmin):
         "estado",
     )
 
-    list_filter = ("estado", "barbero", "fecha")
+    list_filter = (
+        "estado",
+        "barbero",
+        "fecha"
+    )
 
     search_fields = (
         "cliente__nombre",

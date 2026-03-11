@@ -1,80 +1,44 @@
 from django.contrib import admin
-from .models import Cliente, Barbero, Servicio, Cita
+from .models import Cliente, Servicio, Barbero, Cita
 
-
-# =============================
-# CLIENTES
-# =============================
 
 @admin.register(Cliente)
 class ClienteAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "telefono")
+    search_fields = ("nombre", "telefono")
 
-    list_display = (
-        "id",
-        "nombre",
-        "telefono",
-        "creado"
-    )
-
-    search_fields = (
-        "nombre",
-        "telefono"
-    )
-
-
-# =============================
-# BARBEROS
-# =============================
-
-@admin.register(Barbero)
-class BarberoAdmin(admin.ModelAdmin):
-
-    list_display = (
-        "id",
-        "nombre",
-        "activo"
-    )
-
-
-# =============================
-# SERVICIOS
-# =============================
 
 @admin.register(Servicio)
 class ServicioAdmin(admin.ModelAdmin):
-
-    list_display = (
-        "id",
-        "nombre",
-        "precio"
-    )
+    list_display = ("nombre", "precio")
+    search_fields = ("nombre",)
 
 
-# =============================
-# CITAS
-# =============================
+@admin.register(Barbero)
+class BarberoAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "activo")
+    list_filter = ("activo",)
+    search_fields = ("nombre",)
+
 
 @admin.register(Cita)
 class CitaAdmin(admin.ModelAdmin):
-
     list_display = (
-        "id",
         "cliente",
         "servicio",
         "barbero",
         "fecha",
         "hora",
         "precio",
-        "estado"
+        "estado",
     )
 
-    list_filter = (
-        "estado",
-        "barbero",
-        "fecha"
-    )
+    list_filter = ("estado", "barbero", "fecha")
 
     search_fields = (
         "cliente__nombre",
-        "barbero__nombre"
+        "barbero__nombre",
+        "servicio__nombre",
     )
+
+    date_hierarchy = "fecha"

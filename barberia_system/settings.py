@@ -10,6 +10,7 @@ SECRET_KEY = 'django-insecure-pm&=b&o#b#&i2_0na62q_e(u4@)^0%3@p!o@qkelc*r!3^)hi4
 DEBUG = False
 
 ALLOWED_HOSTS = ["barberia-system.onrender.com"]
+CSRF_TRUSTED_ORIGINS = ["https://barberia-system.onrender.com"]
 
 
 # APPLICATIONS

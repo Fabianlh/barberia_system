@@ -28,12 +28,15 @@ SESSION_COOKIE_SAMESITE = "Lax"
 
 # APPS
 INSTALLED_APPS = [
+    "jazzmin",
+
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     "barberia",
 ]
 
@@ -113,3 +116,25 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = "/admin/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Barbería Admin",
+    "site_header": "Sistema de Barbería",
+    "site_brand": "Barbería",
+
+    "welcome_sign": "Bienvenido al panel",
+
+    "topmenu_links": [
+        {"name": "Inicio", "url": "admin:index", "permissions": ["auth.view_user"]},
+    ],
+
+    "show_sidebar": True,
+    "navigation_expanded": True,
+
+    "icons": {
+        "barberia.barbero": "fas fa-user",
+        "barberia.cliente": "fas fa-users",
+        "barberia.cita": "fas fa-calendar",
+        "barberia.servicio": "fas fa-cut",
+    },
+}

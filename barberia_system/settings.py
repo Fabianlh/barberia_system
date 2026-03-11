@@ -7,18 +7,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY
 SECRET_KEY = 'django-insecure-pm&=b&o#b#&i2_0na62q_e(u4@)^0%3@p!o@qkelc*r!3^)hi4'
 
-DEBUG = False  # si ya estás en producción
+DDEBUG = False
 
 ALLOWED_HOSTS = [
-    "barberia-system.onrender.com",
-    "www.barberia-system.onrender.com",
+    "barberia-system.onrender.com"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://barberia-system.onrender.com",
-    "https://www.barberia-system.onrender.com",
+    "https://barberia-system.onrender.com"
 ]
-
 # APPLICATIONS
 INSTALLED_APPS = [
     'django.contrib.admin',

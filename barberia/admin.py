@@ -1,4 +1,9 @@
 from django.contrib import admin
+admin.site.site_header = "Sistema de Barbería"
+admin.site.site_title = "Barbería Admin"
+admin.site.index_title = "Panel de administración"
+
+from django.contrib import admin
 from .models import Cliente, Servicio, Barbero, Cita
 
 

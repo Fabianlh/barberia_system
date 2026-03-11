@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login Barbería</title>
+    <title>Login</title>
 </head>
 <body>
 
@@ -9,7 +9,13 @@
 
 <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+
+    <label>Usuario</label>
+    <input type="text" name="username">
+
+    <label>Contraseña</label>
+    <input type="password" name="password">
+
     <button type="submit">Entrar</button>
 </form>
 

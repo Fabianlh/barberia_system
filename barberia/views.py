@@ -5,8 +5,6 @@ from django.utils import timezone
 from django.db.models import Sum, Count
 from datetime import date, datetime
 
-from .models import Cliente, Cita, Servicio, Barbero
-
 
 # =============================
 # DASHBOARD

@@ -2,5 +2,9 @@ services:
   - type: web
     name: barberia-system
     env: python
-    buildCommand: "./build.sh"
-    startCommand: "gunicorn barberia_system.wsgi:application"
+    plan: free
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+    startCommand: gunicorn barberia_system.wsgi:application --bind 0.0.0.0:$PORT
+    autoDeploy: true

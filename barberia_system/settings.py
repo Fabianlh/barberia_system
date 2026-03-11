@@ -3,8 +3,9 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
+# =========================
 # SEGURIDAD
+# =========================
 SECRET_KEY = "django-insecure-change-this"
 
 DEBUG = False
@@ -25,8 +26,9 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_SAMESITE = "Lax"
 
-
+# =========================
 # APPS
+# =========================
 INSTALLED_APPS = [
     "jazzmin",
 
@@ -40,9 +42,12 @@ INSTALLED_APPS = [
     "barberia",
 ]
 
-
+# =========================
+# MIDDLEWARE
+# =========================
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # sirve estáticos en producción
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -51,86 +56,93 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-
+# =========================
+# URLS
+# =========================
 ROOT_URLCONF = "barberia_system.urls"
 
-
+# =========================
+# TEMPLATES
+# =========================
 TEMPLATES = [
-{
-"BACKEND": "django.template.backends.django.DjangoTemplates",
-"DIRS": [BASE_DIR / "templates"],
-"APP_DIRS": True,
-"OPTIONS": {
-"context_processors": [
-"django.template.context_processors.request",
-"django.contrib.auth.context_processors.auth",
-"django.contrib.messages.context_processors.messages",
-],
-},
-},
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
 ]
 
-
+# =========================
+# WSGI
+# =========================
 WSGI_APPLICATION = "barberia_system.wsgi.application"
 
-
+# =========================
 # BASE DE DATOS
+# =========================
 DATABASES = {
-"default": {
-"ENGINE": "django.db.backends.sqlite3",
-"NAME": BASE_DIR / "db.sqlite3",
-}
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
 }
 
-
+# =========================
 # PASSWORDS
+# =========================
 AUTH_PASSWORD_VALIDATORS = [
-{"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-{"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
-{"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-{"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-
-# IDIOMA
+# =========================
+# IDIOMA Y ZONA HORARIA
+# =========================
 LANGUAGE_CODE = "es"
-
 TIME_ZONE = "America/Bogota"
-
 USE_I18N = True
 USE_TZ = True
 
-
-# ARCHIVOS ESTATICOS
+# =========================
+# ARCHIVOS ESTÁTICOS
+# =========================
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static")
+    os.path.join(BASE_DIR, "barberia", "static")
 ]
 
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-
+# =========================
+# LOGIN / LOGOUT
+# =========================
 LOGIN_URL = "/admin/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
+# =========================
+# JAZZMIN ADMIN
+# =========================
 JAZZMIN_SETTINGS = {
     "site_title": "Barbería Admin",
     "site_header": "Sistema de Barbería",
     "site_brand": "Barbería",
-
     "welcome_sign": "Bienvenido al panel",
-
     "topmenu_links": [
         {"name": "Inicio", "url": "admin:index", "permissions": ["auth.view_user"]},
     ],
-
     "show_sidebar": True,
     "navigation_expanded": True,
-
     "icons": {
         "barberia.barbero": "fas fa-user",
         "barberia.cliente": "fas fa-users",

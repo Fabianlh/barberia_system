@@ -1,6 +1,9 @@
 from pathlib import Path
 import os
 
+# =========================
+# BASE
+# =========================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # =========================
@@ -45,7 +48,7 @@ INSTALLED_APPS = [
 # =========================
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # sirve estáticos
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # sirve estáticos en producción
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -88,7 +91,7 @@ WSGI_APPLICATION = "barberia_system.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",  # en producción SQLite puede dar problemas si se escribe mucho
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -118,6 +121,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "barberia", "static")
 ]
+
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # =========================

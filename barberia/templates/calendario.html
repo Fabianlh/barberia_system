@@ -87,6 +87,12 @@ locale:"es",
 
 editable:true,
 
+height:"auto",
+
+slotDuration:"00:30:00",
+slotMinTime:"09:00:00",
+slotMaxTime:"18:00:00",
+
 headerToolbar:{
 left:"prev,next today",
 center:"title",
@@ -94,7 +100,6 @@ right:"dayGridMonth,timeGridWeek,timeGridDay"
 },
 
 events:"/citas-json/",
-
 
 eventClick:function(info){
 
@@ -107,6 +112,21 @@ info.event.title+
 
 },
 
+eventDidMount:function(info){
+
+if(info.event.extendedProps.estado == "pendiente"){
+info.el.style.backgroundColor = "#ffc107"
+}
+
+if(info.event.extendedProps.estado == "atendida"){
+info.el.style.backgroundColor = "#28a745"
+}
+
+if(info.event.extendedProps.estado == "cancelada"){
+info.el.style.backgroundColor = "#dc3545"
+}
+
+},
 
 eventDrop:function(info){
 

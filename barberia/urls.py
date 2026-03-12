@@ -22,5 +22,5 @@ urlpatterns = [
     path('panel-barbero/', views.panel_barbero, name='panel_barbero'),
     path('mover-cita/', views.mover_cita, name='mover_cita'),
     path('estadisticas-chart/', views.estadisticas_chart, name='estadisticas_chart'),
-
+    path("confirmacion/", views.confirmacion, name="confirmacion"),
 ]

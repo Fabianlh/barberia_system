@@ -81,6 +81,7 @@ def reservar_cita(request):
         fecha = request.POST.get("fecha")
         hora = request.POST.get("hora")
 
+        # validar fecha y hora
         fecha_hora = datetime.strptime(f"{fecha} {hora}", "%Y-%m-%d %H:%M")
         fecha_hora = timezone.make_aware(fecha_hora)
 
@@ -91,11 +92,13 @@ def reservar_cita(request):
                 "barberos": barberos
             })
 
+        # crear o buscar cliente
         cliente, created = Cliente.objects.get_or_create(
             nombre=nombre,
             telefono=telefono
         )
 
+        # verificar si ya existe cita en ese horario
         existe = Cita.objects.filter(
             barbero_id=barbero_id,
             fecha=fecha,
@@ -110,6 +113,7 @@ def reservar_cita(request):
                 "barberos": barberos
             })
 
+        # crear cita
         Cita.objects.create(
             cliente=cliente,
             servicio_id=servicio_id,
@@ -118,14 +122,20 @@ def reservar_cita(request):
             hora=hora
         )
 
-        return render(request, "confirmacion.html")
+        # redirigir a confirmación
+        return redirect("confirmacion")
 
     return render(request, "reservar.html", {
         "servicios": servicios,
         "barberos": barberos
     })
 
+# =============================
+# CONFIRMACION RESERVA
+# =============================
 
+def confirmacion(request):
+    return render(request, "confirmacion.html")
 # =============================
 # HORAS DISPONIBLES
 # =============================

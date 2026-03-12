@@ -35,10 +35,15 @@ class Barbero(models.Model):
 class Servicio(models.Model):
 
     nombre = models.CharField(max_length=100)
+
     precio = models.DecimalField(max_digits=8, decimal_places=2)
 
+    duracion = models.IntegerField(
+        help_text="Duración en minutos"
+    )
+
     def __str__(self):
-        return f"{self.nombre} - ${self.precio}"
+        return self.nombre
 
 
 # =============================

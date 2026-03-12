@@ -24,5 +24,5 @@ echo "✅ Verificando la configuración de Django..."
 python manage.py check
 
 # 6. Iniciar Gunicorn
-echo "🚀 Iniciando Gunicorn..."
-exec gunicorn barberia_system.wsgi:application --bind 0.0.0.0:$PORT
+#echo "🚀 Iniciando Gunicorn..."
+#exec gunicorn barberia_system.wsgi:application --bind 0.0.0.0:$PORT

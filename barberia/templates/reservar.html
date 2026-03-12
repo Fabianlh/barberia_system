@@ -1,47 +1,94 @@
-<form method="post">
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Reservar Cita</title>
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body{
+    background:#f4f6f9;
+}
+
+.card{
+    max-width:500px;
+    margin:auto;
+    margin-top:80px;
+    border-radius:15px;
+}
+
+.btn-barber{
+    background:#111;
+    color:white;
+}
+
+.btn-barber:hover{
+    background:#333;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card shadow p-4">
+
+<h3 class="text-center mb-4">💈 Reservar Cita</h3>
+
+<form method="POST">
 {% csrf_token %}
 
 <div class="mb-3">
-<label>Nombre</label>
+<label class="form-label">Nombre</label>
 <input type="text" name="nombre" class="form-control" required>
 </div>
 
 <div class="mb-3">
-<label>Teléfono</label>
-<input type="text" name="telefono" class="form-control" required>
+<label class="form-label">Teléfono</label>
+<input type="text" name="telefono" class="form-control">
 </div>
 
 <div class="mb-3">
-<label>Servicio</label>
-<select name="servicio" class="form-control">
+<label class="form-label">Servicio</label>
+<select name="servicio" class="form-select">
 {% for servicio in servicios %}
-<option value="{{ servicio.id }}">{{ servicio.nombre }}</option>
+<option value="{{servicio.id}}">{{servicio.nombre}}</option>
 {% endfor %}
 </select>
 </div>
 
 <div class="mb-3">
-<label>Barbero</label>
-<select name="barbero" class="form-control">
+<label class="form-label">Barbero</label>
+<select name="barbero" class="form-select">
 {% for barbero in barberos %}
-<option value="{{ barbero.id }}">{{ barbero.nombre }}</option>
+<option value="{{barbero.id}}">{{barbero.nombre}}</option>
 {% endfor %}
 </select>
 </div>
 
 <div class="mb-3">
-<label>Fecha</label>
+<label class="form-label">Fecha</label>
 <input type="date" name="fecha" class="form-control">
 </div>
 
 <div class="mb-3">
-<label>Hora</label>
+<label class="form-label">Hora</label>
 <input type="time" name="hora" class="form-control">
 </div>
 
-<button type="submit" class="btn btn-primary">
-Reservar
-</button>
+<div class="d-grid">
+<button class="btn btn-barber">Reservar</button>
+</div>
 
 </form>
+
+</div>
+
+</div>
+
+</body>
+</html>

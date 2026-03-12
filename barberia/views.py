@@ -10,6 +10,7 @@ import json
 
 from .models import Cliente, Cita, Servicio, Barbero
 
+
 # =============================
 # DASHBOARD
 # =============================
@@ -20,16 +21,13 @@ def dashboard(request):
     hoy = date.today()
 
     citas_hoy = Cita.objects.filter(fecha=hoy).count()
-
     clientes = Cliente.objects.count()
-
     barberos = Barbero.objects.count()
 
     ingresos_hoy = Cita.objects.filter(
         fecha=hoy,
         estado="atendida"
     ).aggregate(total=Sum("servicio__precio"))["total"] or 0
-
 
     servicio_top = (
         Cita.objects
@@ -40,16 +38,13 @@ def dashboard(request):
         .first()
     )
 
-
     citas = Cita.objects.select_related(
         "cliente",
         "servicio",
         "barbero"
     ).order_by("-fecha")[:10]
 
-
     contexto = {
-
         "hoy": hoy,
         "citas_hoy": citas_hoy,
         "clientes": clientes,
@@ -57,7 +52,6 @@ def dashboard(request):
         "ingresos_hoy": ingresos_hoy,
         "servicio_top": servicio_top,
         "citas": citas
-
     }
 
     return render(request, "dashboard.html", contexto)
@@ -81,7 +75,6 @@ def reservar_cita(request):
         fecha = request.POST.get("fecha")
         hora = request.POST.get("hora")
 
-        # validar fecha y hora
         fecha_hora = datetime.strptime(f"{fecha} {hora}", "%Y-%m-%d %H:%M")
         fecha_hora = timezone.make_aware(fecha_hora)
 
@@ -92,13 +85,11 @@ def reservar_cita(request):
                 "barberos": barberos
             })
 
-        # crear o buscar cliente
         cliente, created = Cliente.objects.get_or_create(
             nombre=nombre,
             telefono=telefono
         )
 
-        # verificar si ya existe cita en ese horario
         existe = Cita.objects.filter(
             barbero_id=barbero_id,
             fecha=fecha,
@@ -113,7 +104,6 @@ def reservar_cita(request):
                 "barberos": barberos
             })
 
-        # crear cita
         Cita.objects.create(
             cliente=cliente,
             servicio_id=servicio_id,
@@ -122,7 +112,6 @@ def reservar_cita(request):
             hora=hora
         )
 
-        # redirigir a confirmación
         return redirect("confirmacion")
 
     return render(request, "reservar.html", {
@@ -130,12 +119,15 @@ def reservar_cita(request):
         "barberos": barberos
     })
 
+
 # =============================
-# CONFIRMACION RESERVA
+# CONFIRMACION
 # =============================
 
 def confirmacion(request):
     return render(request, "confirmacion.html")
+
+
 # =============================
 # HORAS DISPONIBLES
 # =============================
@@ -161,7 +153,6 @@ def horas_disponibles(request):
     ocupadas = [c.strftime("%H:%M") for c in citas]
 
     disponibles = []
-
     ahora = timezone.localtime()
 
     for h in horarios:
@@ -231,17 +222,11 @@ def marcar_atendida(request, cita_id):
 @login_required
 def calendario(request):
 
-    citas = Cita.objects.select_related(
-        "cliente",
-        "servicio",
-        "barbero"
-    ).all()
-
-    return render(request, "calendario.html", {"citas": citas})
+    return render(request, "calendario.html")
 
 
 # =============================
-# CITAS JSON (para calendario)
+# CITAS JSON (CALENDARIO)
 # =============================
 
 def citas_json(request):
@@ -264,16 +249,14 @@ def citas_json(request):
             color = "#dc3545"
 
         eventos.append({
-
             "id": cita.id,
             "title": f"{cita.cliente.nombre} - {cita.servicio.nombre}",
-            "start": f"{cita.fecha}T{cita.hora}",
+            "start": f"{cita.fecha}T{cita.hora.strftime('%H:%M:%S')}",
             "color": color,
             "extendedProps": {
                 "barbero": cita.barbero.nombre,
                 "estado": cita.estado
             }
-
         })
 
     return JsonResponse(eventos, safe=False)
@@ -311,22 +294,34 @@ def panel_barbero(request):
 @csrf_exempt
 def mover_cita(request):
 
-    if request.method == "POST":
+    if request.method != "POST":
+        return JsonResponse({"error": "Método no permitido"}, status=400)
+
+    try:
 
         data = json.loads(request.body)
 
-        cita = Cita.objects.get(id=data["id"])
+        cita_id = data.get("id")
+        fecha = data.get("fecha")
+        hora = data.get("hora")
 
-        cita.fecha = data["fecha"]
-        cita.hora = data["hora"]
+        if not cita_id or not fecha or not hora:
+            return JsonResponse({"error": "Datos incompletos"}, status=400)
 
+        cita = get_object_or_404(Cita, id=cita_id)
+
+        cita.fecha = fecha
+        cita.hora = hora
         cita.save()
 
-        return JsonResponse({"status":"ok"})
+        return JsonResponse({"status": "ok"})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 
 # =============================
-# ESTADISTICAS CHART
+# ESTADISTICAS
 # =============================
 
 @login_required

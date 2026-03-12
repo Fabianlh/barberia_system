@@ -35,12 +35,8 @@ class Barbero(models.Model):
 class Servicio(models.Model):
 
     nombre = models.CharField(max_length=100)
-
     precio = models.DecimalField(max_digits=8, decimal_places=2)
-
-    duracion = models.IntegerField(
-        help_text="Duración en minutos"
-    )
+    duracion = models.IntegerField(help_text="Duración en minutos")
 
     def __str__(self):
         return self.nombre
@@ -68,8 +64,8 @@ class Cita(models.Model):
     precio = models.DecimalField(
         max_digits=8,
         decimal_places=2,
-        null=True,
-        blank=True
+        blank=True,
+        null=True
     )
 
     estado = models.CharField(
@@ -82,10 +78,12 @@ class Cita(models.Model):
 
     class Meta:
         unique_together = ("barbero", "fecha", "hora")
+        ordering = ["-fecha", "-hora"]   # 👈 mejora orden
 
     def save(self, *args, **kwargs):
 
-        if not self.precio:
+        # asignar precio automáticamente
+        if self.precio is None and self.servicio:
             self.precio = self.servicio.precio
 
         super().save(*args, **kwargs)

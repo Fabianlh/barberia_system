@@ -2,18 +2,20 @@ from pathlib import Path
 import os
 import dj_database_url
 
-# =========================
-# BASE
-# =========================
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # =========================
 # SEGURIDAD
 # =========================
 SECRET_KEY = "django-insecure-change-this"
-DEBUG = False
 
-ALLOWED_HOSTS = ["*"]
+DEBUG = True   # TEMPORAL para ver errores en Render
+
+ALLOWED_HOSTS = [
+    "barberia-system.onrender.com",
+    "localhost",
+    "127.0.0.1",
+]
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
@@ -50,9 +52,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# =========================
-# URLS
-# =========================
 ROOT_URLCONF = "barberia_system.urls"
 
 # =========================
@@ -73,9 +72,6 @@ TEMPLATES = [
     },
 ]
 
-# =========================
-# WSGI
-# =========================
 WSGI_APPLICATION = "barberia_system.wsgi.application"
 
 # =========================
@@ -83,7 +79,8 @@ WSGI_APPLICATION = "barberia_system.wsgi.application"
 # =========================
 DATABASES = {
     "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR}/db.sqlite3"
+        default=f"sqlite:///{BASE_DIR}/db.sqlite3",
+        conn_max_age=600
     )
 }
 
@@ -112,21 +109,18 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "barberia", "static"),
-]
-
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # =========================
-# COOKIES SEGURAS
+# CSRF
 # =========================
 CSRF_TRUSTED_ORIGINS = [
     "https://barberia-system.onrender.com"
 ]
 
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+# IMPORTANTE: desactivar por ahora
+CSRF_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = False
 
 # =========================
 # LOGIN

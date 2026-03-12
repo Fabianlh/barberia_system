@@ -1,4 +1,6 @@
 Django>=4.2
 gunicorn
 whitenoise
-jazzmin==2.5.7
+django-jazzmin
+dj-database-url
+psycopg2-binary

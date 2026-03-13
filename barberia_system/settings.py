@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # =========================
 SECRET_KEY = "django-insecure-change-this"
 
-DEBUG = True   # TEMPORAL para ver errores en Render
+DEBUG = True   # Cambiar a False cuando todo funcione
 
 ALLOWED_HOSTS = [
     "barberia-system.onrender.com",
@@ -60,7 +60,10 @@ ROOT_URLCONF = "barberia_system.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+
+        # AQUÍ agregamos la carpeta global de templates
+        "DIRS": [BASE_DIR / "templates"],
+
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -118,7 +121,6 @@ CSRF_TRUSTED_ORIGINS = [
     "https://barberia-system.onrender.com"
 ]
 
-# IMPORTANTE: desactivar por ahora
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
 
@@ -128,6 +130,7 @@ SESSION_COOKIE_SECURE = False
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/login/"
+
 # =========================
 # JAZZMIN
 # =========================

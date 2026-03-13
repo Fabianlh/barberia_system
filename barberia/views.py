@@ -1,30 +1,41 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from django.utils import timezone
 from django.db.models import Sum, Count
 from django.db.models.functions import TruncDay
 from django.views.decorators.csrf import csrf_exempt
+
 from datetime import date, datetime
 import json
 
 from .models import Cliente, Cita, Servicio, Barbero
 
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.contrib import messages
+
+# =============================
+# LOGIN
+# =============================
 
 def login_view(request):
+
     if request.method == "POST":
+
         username = request.POST.get("username")
         password = request.POST.get("password")
+
         user = authenticate(request, username=username, password=password)
+
         if user is not None:
             login(request, user)
-            return redirect("home")  # Cambia 'home' por la ruta que quieras
+            return redirect("dashboard")
         else:
             messages.error(request, "Usuario o contraseña incorrectos")
+
     return render(request, "login.html")
+
+
 # =============================
 # DASHBOARD
 # =============================
@@ -193,12 +204,10 @@ def agenda(request):
         "barbero"
     ).all().order_by("fecha","hora")
 
-    contexto = {
+    return render(request, "agenda.html", {
         "citas": citas,
         "hoy": date.today()
-    }
-
-    return render(request, "agenda.html", contexto)
+    })
 
 
 # =============================
@@ -235,12 +244,11 @@ def marcar_atendida(request, cita_id):
 
 @login_required
 def calendario(request):
-
     return render(request, "calendario.html")
 
 
 # =============================
-# CITAS JSON (CALENDARIO)
+# CITAS JSON
 # =============================
 
 def citas_json(request):
@@ -266,11 +274,7 @@ def citas_json(request):
             "id": cita.id,
             "title": f"{cita.cliente.nombre} - {cita.servicio.nombre}",
             "start": f"{cita.fecha}T{cita.hora.strftime('%H:%M:%S')}",
-            "color": color,
-            "extendedProps": {
-                "barbero": cita.barbero.nombre,
-                "estado": cita.estado
-            }
+            "color": color
         })
 
     return JsonResponse(eventos, safe=False)
@@ -293,16 +297,14 @@ def panel_barbero(request):
         fecha=hoy
     ).order_by("hora")
 
-    contexto = {
+    return render(request, "panel_barbero.html", {
         "citas": citas,
         "hoy": hoy
-    }
-
-    return render(request, "panel_barbero.html", contexto)
+    })
 
 
 # =============================
-# MOVER CITA (DRAG CALENDARIO)
+# MOVER CITA
 # =============================
 
 @csrf_exempt
@@ -318,9 +320,6 @@ def mover_cita(request):
         cita_id = data.get("id")
         fecha = data.get("fecha")
         hora = data.get("hora")
-
-        if not cita_id or not fecha or not hora:
-            return JsonResponse({"error": "Datos incompletos"}, status=400)
 
         cita = get_object_or_404(Cita, id=cita_id)
 

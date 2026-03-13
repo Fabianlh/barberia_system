@@ -1,130 +1,66 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
+{% extends 'base.html' %}
 
-<meta charset="UTF-8">
+{% block content %}
 
-<title>Dashboard Barbería</title>
+<h2 class="mb-4">Dashboard Barbería</h2>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<p class="text-muted">Hoy: {{ hoy }}</p>
 
-<style>
 
-body{
-font-family:Arial;
-background:#f4f6f9;
-}
+<div class="row mb-4">
 
-.container{
-width:95%;
-margin:auto;
-margin-top:30px;
-}
-
-.cards{
-display:flex;
-gap:20px;
-flex-wrap:wrap;
-margin-bottom:30px;
-}
-
-.card{
-
-padding:20px;
-
-border-radius:10px;
-
-color:white;
-
-width:200px;
-
-}
-
-.azul{background:#007bff;}
-.verde{background:#28a745;}
-.naranja{background:#fd7e14;}
-.rojo{background:#dc3545;}
-
-.servicio-top{
-
-background:#20c997;
-
-color:white;
-
-padding:20px;
-
-border-radius:10px;
-
-margin-bottom:30px;
-
-width:300px;
-
-}
-
-table{
-
-width:100%;
-
-background:white;
-
-border-collapse:collapse;
-
-}
-
-th,td{
-
-padding:10px;
-
-border-bottom:1px solid #ddd;
-
-text-align:left;
-
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="container">
-
-<h2>Dashboard Barbería</h2>
-
-<p>Hoy: {{ hoy }}</p>
-
-<div class="cards">
-
-<div class="card azul">
-<h3>Citas Hoy</h3>
-<h1>{{ citas_hoy }}</h1>
+<div class="col-md-3">
+<div class="card text-white bg-primary shadow">
+<div class="card-body text-center">
+<h5>Citas Hoy</h5>
+<h2>{{ citas_hoy }}</h2>
+</div>
+</div>
 </div>
 
-<div class="card verde">
-<h3>Ingresos Hoy</h3>
-<h1>${{ ingresos_hoy }}</h1>
+<div class="col-md-3">
+<div class="card text-white bg-success shadow">
+<div class="card-body text-center">
+<h5>Ingresos Hoy</h5>
+<h2>${{ ingresos_hoy }}</h2>
+</div>
+</div>
 </div>
 
-<div class="card naranja">
-<h3>Clientes</h3>
-<h1>{{ clientes }}</h1>
+<div class="col-md-3">
+<div class="card text-white bg-warning shadow">
+<div class="card-body text-center">
+<h5>Clientes</h5>
+<h2>{{ clientes }}</h2>
+</div>
+</div>
 </div>
 
-<div class="card rojo">
-<h3>Barberos</h3>
-<h1>{{ barberos }}</h1>
+<div class="col-md-3">
+<div class="card text-white bg-danger shadow">
+<div class="card-body text-center">
+<h5>Barberos</h5>
+<h2>{{ barberos }}</h2>
+</div>
+</div>
 </div>
 
 </div>
 
 
-<div class="servicio-top">
+<div class="row mb-4">
 
-<h3>Servicio más solicitado</h3>
+<div class="col-md-4">
+
+<div class="card bg-info text-white shadow">
+
+<div class="card-body">
+
+<h5>Servicio más solicitado</h5>
 
 {% if servicio_top %}
 
-<h2>{{ servicio_top.servicio__nombre }}</h2>
+<h3>{{ servicio_top.servicio__nombre }}</h3>
 
 <p>Citas realizadas: {{ servicio_top.total }}</p>
 
@@ -136,52 +72,78 @@ text-align:left;
 
 </div>
 
+</div>
 
-<h3>Ingresos</h3>
+</div>
+
+
+<div class="col-md-8">
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h5>Ingresos</h5>
 
 <canvas id="graficaIngresos"></canvas>
 
+</div>
 
-<h3>Últimas citas</h3>
+</div>
 
-<table>
+</div>
+
+</div>
+
+
+<div class="card shadow">
+
+<div class="card-body">
+
+<h5>Últimas citas</h5>
+
+<table class="table table-striped">
+
+<thead>
 
 <tr>
 
 <th>Cliente</th>
-
 <th>Servicio</th>
-
 <th>Barbero</th>
-
 <th>Fecha</th>
-
 <th>Hora</th>
 
 </tr>
+
+</thead>
+
+<tbody>
 
 {% for cita in citas %}
 
 <tr>
 
 <td>{{ cita.cliente.nombre }}</td>
-
 <td>{{ cita.servicio.nombre }}</td>
-
 <td>{{ cita.barbero.nombre }}</td>
-
 <td>{{ cita.fecha }}</td>
-
 <td>{{ cita.hora }}</td>
 
 </tr>
 
 {% endfor %}
 
+</tbody>
+
 </table>
 
 </div>
 
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 
@@ -225,5 +187,4 @@ responsive:true
 
 </script>
 
-</body>
-</html>
+{% endblock %}

@@ -9,7 +9,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # =========================
 SECRET_KEY = "django-insecure-change-this"
 
-DEBUG = True   # Cambiar a False cuando todo funcione
+DEBUG = True  # Cambia a False en producción
 
 ALLOWED_HOSTS = [
     "barberia-system.onrender.com",
@@ -60,10 +60,7 @@ ROOT_URLCONF = "barberia_system.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-
-        # AQUÍ agregamos la carpeta global de templates
-        "DIRS": [BASE_DIR / "templates"],
-
+        "DIRS": [BASE_DIR / "templates"],  # opcional global
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -107,9 +104,15 @@ USE_I18N = True
 USE_TZ = True
 
 # =========================
-# ARCHIVOS ESTÁTICOS
+# ARCHIVOS ESTÁTICOS (CLAVE)
 # =========================
 STATIC_URL = "/static/"
+
+# 👉 ESTA LÍNEA ES LA QUE TE FALTABA
+STATICFILES_DIRS = [
+    BASE_DIR / "barberia/static",
+]
+
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
@@ -127,9 +130,9 @@ SESSION_COOKIE_SECURE = False
 # =========================
 # LOGIN
 # =========================
-LOGIN_URL = "/login/"
+LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "/"
-LOGOUT_REDIRECT_URL = "/login/"
+LOGOUT_REDIRECT_URL = "/accounts/login/"
 
 # =========================
 # JAZZMIN

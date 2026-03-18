@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.db.models import Sum, Count
 from django.db.models.functions import TruncDay
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
 from datetime import date, datetime
 import json
@@ -20,8 +20,10 @@ from .models import Cliente, Cita, Servicio, Barbero
 
 def login_view(request):
 
-    if request.method == "POST":
+    if request.user.is_authenticated:
+        return redirect("dashboard")
 
+    if request.method == "POST":
         username = request.POST.get("username")
         password = request.POST.get("password")
 
@@ -37,7 +39,16 @@ def login_view(request):
 
 
 # =============================
-# DASHBOARD
+# LOGOUT
+# =============================
+
+def logout_view(request):
+    logout(request)
+    return redirect("login")
+
+
+# =============================
+# DASHBOARD (ADMIN)
 # =============================
 
 @login_required
@@ -49,7 +60,7 @@ def dashboard(request):
     clientes = Cliente.objects.count()
     barberos = Barbero.objects.count()
 
-    ingresos_hoy = Cita.objects.filter(
+    ingresos = Cita.objects.filter(
         fecha=hoy,
         estado="atendida"
     ).aggregate(total=Sum("servicio__precio"))["total"] or 0
@@ -64,22 +75,49 @@ def dashboard(request):
     )
 
     citas = Cita.objects.select_related(
-        "cliente",
-        "servicio",
-        "barbero"
-    ).order_by("-fecha")[:10]
+        "cliente", "servicio", "barbero"
+    ).order_by("-fecha", "-hora")[:10]
 
-    contexto = {
+    return render(request, "dashboard.html", {
         "hoy": hoy,
         "citas_hoy": citas_hoy,
         "clientes": clientes,
         "barberos": barberos,
-        "ingresos_hoy": ingresos_hoy,
-        "servicio_top": servicio_top,
+        "ingresos": ingresos,
+        "servicio_popular": servicio_top["servicio__nombre"] if servicio_top else "No hay datos",
         "citas": citas
-    }
+    })
 
-    return render(request, "dashboard.html", contexto)
+
+# =============================
+# PANEL BARBERO
+# =============================
+
+@login_required
+def panel_barbero(request):
+
+    hoy = date.today()
+
+    citas = Cita.objects.filter(
+        fecha=hoy,
+        barbero__usuario=request.user
+    ).select_related("cliente", "servicio").order_by("hora")
+
+    ingresos = Cita.objects.filter(
+        fecha=hoy,
+        barbero__usuario=request.user,
+        estado="atendida"
+    ).aggregate(total=Sum("servicio__precio"))["total"] or 0
+
+    return render(request, "barberia/panel_barbero.html", {
+        "citas": citas,
+        "hoy": hoy,
+        "citas_hoy": citas.count(),
+        "ingresos": ingresos,
+        "clientes": Cliente.objects.count(),
+        "barberos": Barbero.objects.count(),
+        "servicio_popular": "En progreso"
+    })
 
 
 # =============================
@@ -110,7 +148,7 @@ def reservar_cita(request):
                 "barberos": barberos
             })
 
-        cliente, created = Cliente.objects.get_or_create(
+        cliente, _ = Cliente.objects.get_or_create(
             nombre=nombre,
             telefono=telefono
         )
@@ -154,7 +192,7 @@ def confirmacion(request):
 
 
 # =============================
-# HORAS DISPONIBLES
+# HORAS DISPONIBLES (AJAX)
 # =============================
 
 def horas_disponibles(request):
@@ -181,7 +219,6 @@ def horas_disponibles(request):
     ahora = timezone.localtime()
 
     for h in horarios:
-
         hora_dt = datetime.strptime(f"{fecha} {h}", "%Y-%m-%d %H:%M")
         hora_dt = timezone.make_aware(hora_dt)
 
@@ -199,10 +236,8 @@ def horas_disponibles(request):
 def agenda(request):
 
     citas = Cita.objects.select_related(
-        "cliente",
-        "servicio",
-        "barbero"
-    ).all().order_by("fecha","hora")
+        "cliente", "servicio", "barbero"
+    ).order_by("fecha", "hora")
 
     return render(request, "agenda.html", {
         "citas": citas,
@@ -218,6 +253,10 @@ def agenda(request):
 def cancelar_cita(request, cita_id):
 
     cita = get_object_or_404(Cita, id=cita_id)
+
+    if cita.barbero.usuario != request.user:
+        return redirect("dashboard")
+
     cita.estado = "cancelada"
     cita.save()
 
@@ -232,6 +271,10 @@ def cancelar_cita(request, cita_id):
 def marcar_atendida(request, cita_id):
 
     cita = get_object_or_404(Cita, id=cita_id)
+
+    if cita.barbero.usuario != request.user:
+        return redirect("dashboard")
+
     cita.estado = "atendida"
     cita.save()
 
@@ -251,86 +294,28 @@ def calendario(request):
 # CITAS JSON
 # =============================
 
+@login_required
 def citas_json(request):
 
     citas = Cita.objects.select_related(
-        "cliente",
-        "servicio",
-        "barbero"
-    ).all()
+        "cliente", "servicio", "barbero"
+    )
 
     eventos = []
 
     for cita in citas:
-
-        if cita.estado == "pendiente":
-            color = "#ffc107"
-        elif cita.estado == "atendida":
-            color = "#28a745"
-        else:
-            color = "#dc3545"
-
         eventos.append({
             "id": cita.id,
             "title": f"{cita.cliente.nombre} - {cita.servicio.nombre}",
             "start": f"{cita.fecha}T{cita.hora.strftime('%H:%M:%S')}",
-            "color": color
+            "color": (
+                "#ffc107" if cita.estado == "pendiente"
+                else "#28a745" if cita.estado == "atendida"
+                else "#dc3545"
+            )
         })
 
     return JsonResponse(eventos, safe=False)
-
-
-# =============================
-# PANEL BARBERO
-# =============================
-
-@login_required
-def panel_barbero(request):
-
-    hoy = date.today()
-
-    citas = Cita.objects.select_related(
-        "cliente",
-        "servicio",
-        "barbero"
-    ).filter(
-        fecha=hoy
-    ).order_by("hora")
-
-    return render(request, "panel_barbero.html", {
-        "citas": citas,
-        "hoy": hoy
-    })
-
-
-# =============================
-# MOVER CITA
-# =============================
-
-@csrf_exempt
-def mover_cita(request):
-
-    if request.method != "POST":
-        return JsonResponse({"error": "Método no permitido"}, status=400)
-
-    try:
-
-        data = json.loads(request.body)
-
-        cita_id = data.get("id")
-        fecha = data.get("fecha")
-        hora = data.get("hora")
-
-        cita = get_object_or_404(Cita, id=cita_id)
-
-        cita.fecha = fecha
-        cita.hora = hora
-        cita.save()
-
-        return JsonResponse({"status": "ok"})
-
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
 
 
 # =============================
@@ -352,7 +337,6 @@ def estadisticas_chart(request):
     valores = []
 
     for d in datos:
-
         labels.append(d["dia"].strftime("%Y-%m-%d"))
         valores.append(float(d["total"]))
 
@@ -360,3 +344,38 @@ def estadisticas_chart(request):
         "labels": labels,
         "valores": valores
     })
+
+
+# =============================
+# MOVER CITA (DRAG & DROP)
+# =============================
+
+@login_required
+@require_POST
+def mover_cita(request):
+    try:
+        data = json.loads(request.body)
+
+        cita_id = data.get("id")
+        fecha = data.get("fecha")
+        hora = data.get("hora")
+
+        cita = get_object_or_404(Cita, id=cita_id)
+
+        existe = Cita.objects.filter(
+            barbero=cita.barbero,
+            fecha=fecha,
+            hora=hora
+        ).exclude(id=cita.id).exists()
+
+        if existe:
+            return JsonResponse({"error": "Horario ocupado"}, status=400)
+
+        cita.fecha = fecha
+        cita.hora = hora
+        cita.save()
+
+        return JsonResponse({"status": "ok"})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

@@ -1,151 +1,36 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<h1>Reservar Cita</h1>
 
-<h2 class="mb-4">Reservar Cita</h2>
+<form method="post">
+    {% csrf_token %}
 
-{% if error %}
-<div class="alert alert-danger">
-{{ error }}
-</div>
-{% endif %}
+    <input type="text" name="nombre" placeholder="Nombre"><br><br>
+    <input type="text" name="telefono" placeholder="Teléfono"><br><br>
 
-<form method="POST">
+    <label>Servicio:</label>
+    <select name="servicio">
+        {% for s in servicios %}
+        <option value="{{ s.id }}">{{ s.nombre }}</option>
+        {% endfor %}
+    </select><br><br>
 
-{% csrf_token %}
+    <label>Barbero:</label>
+    <select name="barbero">
+        {% for b in barberos %}
+        <option value="{{ b.id }}">{{ b.nombre }}</option>
+        {% endfor %}
+    </select><br><br>
 
-<div class="row">
+    <input type="date" name="fecha"><br><br>
+    <input type="time" name="hora"><br><br>
 
-<div class="col-md-6 mb-3">
-<label>Nombre</label>
-<input type="text" name="nombre" class="form-control" required>
-</div>
-
-<div class="col-md-6 mb-3">
-<label>Teléfono</label>
-<input type="text" name="telefono" class="form-control" required>
-</div>
-
-</div>
-
-
-<div class="row">
-
-<div class="col-md-6 mb-3">
-
-<label>Servicio</label>
-
-<select name="servicio" class="form-control" required>
-
-<option value="">Seleccione servicio</option>
-
-{% for s in servicios %}
-
-<option value="{{ s.id }}">
-{{ s.nombre }} - ${{ s.precio }}
-</option>
-
-{% endfor %}
-
-</select>
-
-</div>
-
-
-<div class="col-md-6 mb-3">
-
-<label>Barbero</label>
-
-<select name="barbero" id="barbero" class="form-control" required>
-
-<option value="">Seleccione barbero</option>
-
-{% for b in barberos %}
-
-<option value="{{ b.id }}">
-{{ b.nombre }}
-</option>
-
-{% endfor %}
-
-</select>
-
-</div>
-
-</div>
-
-
-<div class="row">
-
-<div class="col-md-6 mb-3">
-
-<label>Fecha</label>
-
-<input type="date" name="fecha" id="fecha" class="form-control" required>
-
-</div>
-
-
-<div class="col-md-6 mb-3">
-
-<label>Hora disponible</label>
-
-<select name="hora" id="hora" class="form-control" required>
-
-<option value="">Seleccione hora</option>
-
-</select>
-
-</div>
-
-</div>
-
-
-<button class="btn btn-primary">
-Reservar cita
-</button>
-
+    <button type="submit">Reservar</button>
 </form>
 
-
-<script>
-
-const fecha = document.getElementById("fecha");
-const barbero = document.getElementById("barbero");
-const hora = document.getElementById("hora");
-
-function cargarHoras(){
-
-if(!fecha.value || !barbero.value){
-return;
-}
-
-fetch(`/horas-disponibles/?fecha=${fecha.value}&barbero=${barbero.value}`)
-
-.then(res => res.json())
-
-.then(data => {
-
-hora.innerHTML = "";
-
-data.forEach(h => {
-
-const option = document.createElement("option");
-
-option.value = h;
-option.text = h;
-
-hora.appendChild(option);
-
-});
-
-});
-
-}
-
-fecha.addEventListener("change", cargarHoras);
-barbero.addEventListener("change", cargarHoras);
-
-</script>
+{% if error %}
+<p style="color:red;">{{ error }}</p>
+{% endif %}
 
 {% endblock %}

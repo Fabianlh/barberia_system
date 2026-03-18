@@ -2,189 +2,50 @@
 
 {% block content %}
 
-<h2 class="mb-4">Dashboard Barbería</h2>
+<h1>Dashboard</h1>
 
-<p class="text-muted">Hoy: {{ hoy }}</p>
+<div class="grid">
+    <div class="card">
+        <div class="title">Citas Hoy</div>
+        <div class="value">{{ citas_hoy }}</div>
+    </div>
 
+    <div class="card">
+        <div class="title">Clientes</div>
+        <div class="value">{{ clientes }}</div>
+    </div>
 
-<div class="row mb-4">
+    <div class="card">
+        <div class="title">Barberos</div>
+        <div class="value">{{ barberos }}</div>
+    </div>
 
-<div class="col-md-3">
-<div class="card text-white bg-primary shadow">
-<div class="card-body text-center">
-<h5>Citas Hoy</h5>
-<h2>{{ citas_hoy }}</h2>
-</div>
-</div>
-</div>
-
-<div class="col-md-3">
-<div class="card text-white bg-success shadow">
-<div class="card-body text-center">
-<h5>Ingresos Hoy</h5>
-<h2>${{ ingresos_hoy }}</h2>
-</div>
-</div>
-</div>
-
-<div class="col-md-3">
-<div class="card text-white bg-warning shadow">
-<div class="card-body text-center">
-<h5>Clientes</h5>
-<h2>{{ clientes }}</h2>
-</div>
-</div>
+    <div class="card">
+        <div class="title">Ingresos</div>
+        <div class="value">${{ ingresos }}</div>
+    </div>
 </div>
 
-<div class="col-md-3">
-<div class="card text-white bg-danger shadow">
-<div class="card-body text-center">
-<h5>Barberos</h5>
-<h2>{{ barberos }}</h2>
+<div class="card">
+    <h3>Últimas citas</h3>
+
+    <table>
+        <tr>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Cliente</th>
+            <th>Servicio</th>
+        </tr>
+
+        {% for cita in citas %}
+        <tr>
+            <td>{{ cita.fecha }}</td>
+            <td>{{ cita.hora }}</td>
+            <td>{{ cita.cliente.nombre }}</td>
+            <td>{{ cita.servicio.nombre }}</td>
+        </tr>
+        {% endfor %}
+    </table>
 </div>
-</div>
-</div>
-
-</div>
-
-
-<div class="row mb-4">
-
-<div class="col-md-4">
-
-<div class="card bg-info text-white shadow">
-
-<div class="card-body">
-
-<h5>Servicio más solicitado</h5>
-
-{% if servicio_top %}
-
-<h3>{{ servicio_top.servicio__nombre }}</h3>
-
-<p>Citas realizadas: {{ servicio_top.total }}</p>
-
-{% else %}
-
-<p>No hay datos aún</p>
-
-{% endif %}
-
-</div>
-
-</div>
-
-</div>
-
-
-<div class="col-md-8">
-
-<div class="card shadow">
-
-<div class="card-body">
-
-<h5>Ingresos</h5>
-
-<canvas id="graficaIngresos"></canvas>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-
-<div class="card shadow">
-
-<div class="card-body">
-
-<h5>Últimas citas</h5>
-
-<table class="table table-striped">
-
-<thead>
-
-<tr>
-
-<th>Cliente</th>
-<th>Servicio</th>
-<th>Barbero</th>
-<th>Fecha</th>
-<th>Hora</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-{% for cita in citas %}
-
-<tr>
-
-<td>{{ cita.cliente.nombre }}</td>
-<td>{{ cita.servicio.nombre }}</td>
-<td>{{ cita.barbero.nombre }}</td>
-<td>{{ cita.fecha }}</td>
-<td>{{ cita.hora }}</td>
-
-</tr>
-
-{% endfor %}
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-
-fetch("/estadisticas-chart/")
-
-.then(response => response.json())
-
-.then(data => {
-
-const ctx = document.getElementById('graficaIngresos');
-
-new Chart(ctx,{
-
-type:'line',
-
-data:{
-
-labels:data.labels,
-
-datasets:[{
-
-label:'Ingresos',
-
-data:data.valores,
-
-borderWidth:3
-
-}]
-
-},
-
-options:{
-
-responsive:true
-
-}
-
-})
-
-})
-
-</script>
 
 {% endblock %}
